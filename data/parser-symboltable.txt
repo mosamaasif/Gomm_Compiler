@@ -1,0 +1,8 @@
+ID : DT
+a : char
+first : Integer
+i : Integer
+j : Integer
+length : Integer
+num : Integer
+temp : Integer

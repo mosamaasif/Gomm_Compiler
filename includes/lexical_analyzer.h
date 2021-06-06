@@ -92,7 +92,7 @@ void handleArithmeticOps(const std::string& sc, int& idx, std::vector<PAIR>& tok
         else if (sc[idx] == '*') {
             auto cmntEndIdx = sc.find("*/", idx);
             if (cmntEndIdx != std::string::npos)
-                idx = cmntEndIdx + 1;
+                idx = cmntEndIdx + 2;
             else {
                 LA_LOG(ERRORS::CMNT_DANGLING_MARKER_START);
             }

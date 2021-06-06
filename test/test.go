@@ -10,16 +10,16 @@ func Integer: numPrint (Integer: num, Integer: length)
     while i > 0:
     {
         first:=0;
-        j <- 1;
+        j := 1;
         while j < i:
         {
             write( j);
             j:=j + 1;
         }
-        if j == 1:{
+        if j = 1:{
             print("one");
         }
-        elif j==2:{
+        elif j=2:{
             print("two");
         }
         else

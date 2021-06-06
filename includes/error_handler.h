@@ -28,7 +28,7 @@ static const std::string ERR_MSGS[] = {
         "Comment has no ending marker, only dangling start marker",
         "Literal Constant has more than one char",
         "Literal String has no termination quote",
-        "Bad Token: "
+        "Bad Token"
 };
 
 
@@ -60,12 +60,17 @@ static std::string buildLAErrorStr(const ERRORS& err) {
     return error;
 }
 
-static std::string buildParErrorStr(const ERRORS& err, const std::string& tok) {
+static std::string buildParErrorStr(const ERRORS& err, const std::string& expTok,  const std::string& foundTok) {
     std::string error = std::string()
                         + "[PARSER ERROR]"
-                        + "\n\tMESSAGE: "
+                        + "\n\tTYPE: "
                         + ERR_MSGS[err]
-                        + tok
+                        + "\n\tMESSAGE: "
+                        + "Expected token \'"
+                        + expTok
+                        + "\', but found token \'"
+                        + foundTok
+                        + "\'"
                         + "\n\tFILE: "
                         + FILENAME
                         + "\n\n";
@@ -80,5 +85,5 @@ static std::string buildParErrorStr(const ERRORS& err, const std::string& tok) {
 #define LA_LOG(err_type)                                                                \
             throw std::runtime_error(buildLAErrorStr(err_type))
 
-#define PAR_LOG(err_type, tok)                                                               \
-            throw std::runtime_error(buildParErrorStr(err_type, tok))
+#define PAR_LOG(err_type, expTok, foundTok)                                                               \
+            throw std::runtime_error(buildParErrorStr(err_type, expTok, foundTok))

@@ -13,9 +13,9 @@
 				"-I",
 				"${workspaceFolder}/includes/",
 				"-g",
-				"${file}",
+				"${workspaceFolder}/src/main.cpp",
 				"-o",
-				"out/debug/${fileBasenameNoExtension}"
+				"out/debug/main"
 			],
 			"options": {
 				"cwd": "${workspaceFolder}"
