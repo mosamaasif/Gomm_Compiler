@@ -1,0 +1,44 @@
+a = 'x'
+out "enter number"
+in i
+out i \n
+i = length
+if i > 0 goto 8
+goto 42
+first = 0
+j = 1
+if j < i goto 12
+goto 17
+t1 = 1 * 3
+t2 = t1 / 4
+t3 = j + t2
+j = t3
+goto 10
+if j = 1 goto 19
+goto 21
+out "one"
+goto 39
+if j = 2 goto 23
+goto 34
+out "two"
+if j = 2 goto 26
+goto 28
+out "two1"
+goto 33
+if j = 3 goto 30
+goto 32
+out "How even?!"
+goto 33
+out "no two1"
+goto 39
+if j = 3 goto 36
+goto 38
+out "three"
+goto 39
+out "others"
+t4 = i - 1
+i = t4
+goto 6
+out "temp is"
+out temp \n
+ret i

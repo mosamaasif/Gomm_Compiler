@@ -1,0 +1,8 @@
+ID | DT | S
+num | Integer | 0
+length | Integer | 4
+i | Integer | 8
+j | Integer | 12
+first | Integer | 16
+temp | Integer | 20
+a | char | 24

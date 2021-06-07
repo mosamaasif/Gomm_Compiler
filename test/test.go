@@ -14,13 +14,25 @@ func Integer: numPrint (Integer: num, Integer: length)
         while j < i:
         {
             write( j);
-            j:=j + 1;
+            j:=j + 1 * 3 / 4;
         }
         if j = 1:{
             print("one");
         }
         elif j=2:{
             print("two");
+            if j = 2:{
+                print("two1");
+            }
+            elif j=3: {
+                print("How even?!");
+            }
+            else {
+                print("no two1");
+            }
+        }
+        elif j=3:{
+            print("three");
         }
         else
         {

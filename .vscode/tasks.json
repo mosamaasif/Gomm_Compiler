@@ -14,6 +14,9 @@
 				"${workspaceFolder}/includes/",
 				"-g",
 				"${workspaceFolder}/src/main.cpp",
+				"${workspaceFolder}/src/lexical_analyzer.cpp",
+				"${workspaceFolder}/src/parser.cpp",
+				"${workspaceFolder}/src/translator.cpp",
 				"-o",
 				"out/debug/main"
 			],

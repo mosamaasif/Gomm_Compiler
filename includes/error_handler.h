@@ -13,7 +13,9 @@ enum ERRORS {
     CMNT_DANGLING_MARKER_START,
     LITERAL_CONST_ERR,
     LITERAL_STR_ERR,
-    BAD_TOK
+    BAD_TOK,
+    SYMBOL_TABLE_FILE_OPEN_ERROR,
+    TAC_FILE_OPEN_ERROR
 };
 
 static std::string FILENAME;
@@ -28,7 +30,9 @@ static const std::string ERR_MSGS[] = {
         "Comment has no ending marker, only dangling start marker",
         "Literal Constant has more than one char",
         "Literal String has no termination quote",
-        "Bad Token"
+        "Bad Token",
+        "Failed to Open Symbol Table File",
+        "Failed to Open Three Address Code File"
 };
 
 
