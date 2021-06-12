@@ -6,3 +6,7 @@ j | Integer | 12
 first | Integer | 16
 temp | Integer | 20
 a | char | 24
+t1 | Integer | 25
+t2 | Integer | 29
+t3 | Integer | 33
+t4 | Integer | 37

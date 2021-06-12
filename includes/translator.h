@@ -362,6 +362,8 @@ private:
             std::string termLex = "* " + F() + " ";
 
             std::string temp = "t" + std::to_string(tempValIdx++);
+            symbols[temp] = { temp, "Integer", 0};
+            addToST(4, temp);
             emit(4, temp.c_str(), "=", prevLex.c_str(), termLex.c_str());
 
             return termPrime(temp);
@@ -372,6 +374,8 @@ private:
             std::string termLex = "/ " + F() + " ";
 
             std::string temp = "t" + std::to_string(tempValIdx++);
+            symbols[temp] = { temp, "Integer", 0};
+            addToST(4, temp);
             emit(4, temp.c_str(), "=", prevLex.c_str(), termLex.c_str());
             
             return termPrime(temp);
@@ -395,6 +399,8 @@ private:
             std::string termLex = "+ " + term() + " ";
 
             std::string temp = "t" + std::to_string(tempValIdx++);
+            symbols[temp] = { temp, "Integer", 0};
+            addToST(4, temp);
             emit(4, temp.c_str(), "=", prevLex.c_str(), termLex.c_str());
 
             return expressionPrime(temp);
@@ -405,6 +411,8 @@ private:
             std::string termLex = "- " + term() + " ";
 
             std::string temp = "t" + std::to_string(tempValIdx++);
+            symbols[temp] = { temp, "Integer", 0};
+            addToST(4, temp);
             emit(4, temp.c_str(), "=", prevLex.c_str(), termLex.c_str());
             
             return expressionPrime(temp);
