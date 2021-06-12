@@ -42,7 +42,8 @@
   </ol>
 </details>
 
-
+***NOTE:***  
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`Refer to Documentation.pdf for further details, including CFGs.`
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
@@ -74,6 +75,8 @@ The language it compiles is a made up language called Go--. Rules for this langu
   <li>Input operator: >>.</li>
   <li>semi colon, colon, comma.</li>
 </ol>
+
+
 
 ### Built With
 
