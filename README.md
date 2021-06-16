@@ -36,14 +36,10 @@
     <li><a href="#usage">Usage</a></li>
     <ul>
         <li><a href="#how-to-run">How to Run</a></li>
-        <li><a href="#example-images">Example Images</a></li>
       </ul>
     <li><a href="#license">License</a></li>
   </ol>
 </details>
-
-***NOTE:***  
-   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`Refer to Documentation.pdf for further details, including CFGs.`
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
@@ -77,6 +73,8 @@ The language it compiles is a made up language called Go--. Rules for this langu
 </ol>
 
 
+***NOTE:***  
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`Refer to Documentation.pdf for further details, including CFGs.`
 
 ### Built With
 
