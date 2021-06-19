@@ -783,3 +783,8 @@ std::vector<Parser::Token> Parser::run(const std::string &wListPath)
 
     return toks;
 }
+
+Parser::~Parser()
+{
+    delete m_Instance;
+}

@@ -9,6 +9,7 @@
 #include <cstdarg>
 #include <string>
 #include <vector>
+#include <tuple>
 class Translator
 {
 
@@ -21,6 +22,8 @@ public:
         return m_Instance;
     }
 
+    ~Translator();
+
 private:
     static Translator *m_Instance;
 
@@ -28,6 +31,7 @@ private:
     {
         std::string lex, dt;
         int addr;
+        int initVal;
     };
 
     struct less_than_key
@@ -56,6 +60,27 @@ private:
     std::map<std::string, STData> symbols;
 
     std::vector<std::string> tacLines;
+    std::vector<std::tuple<int, int, int, int>> quadTuples;
+
+    std::map<std::string, int> opcodes = {
+        {"goto", 0},
+        {"ret", 1},
+        {"in", 2},
+        {"out", 3},
+        {"outln", 4},
+        {"<", 5},
+        {"<=", 6},
+        {">", 7},
+        {">=", 8},
+        {"==", 10},
+        {"!=", 11},
+        {":=", 12},
+        {"+", 13},
+        {"-", 14},
+        {"*", 15},
+        {"/", 16},
+        {"+", 17},
+    };
 
     int addr = 0, n = 1;
     int tempValIdx = 1;
@@ -93,7 +118,16 @@ private:
         rtrim(s);
     }
 
+    static inline bool isNumber(const std::string &str)
+    {
+        return str.find_first_not_of("0123456789") == std::string::npos;
+    }
+
     void emit(int num, ...);
+
+    void quad(int a, int b, int c, int d);
+
+    std::string handleNumericConstant(const std::string &str);
 
     void backpatch(int lineNo, int value);
 

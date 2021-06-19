@@ -17,6 +17,8 @@ public:
         return m_Instance;
     }
 
+    ~Parser();
+
 private:
     static Parser *m_Instance;
 
