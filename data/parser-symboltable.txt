@@ -1,8 +1,6 @@
 ID | DT
-a | char
-first | Integer
 i | Integer
 j | Integer
+k | Integer
 length | Integer
 num | Integer
-temp | Integer

@@ -1,8 +1,11 @@
+/* GENERATES BOTH TAC AND MACHINE CODE*/
+
 #include "translator.h"
 
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <algorithm>
 
 #include "error_handler.h"
 
@@ -74,7 +77,7 @@ void Translator::loadST(const std::string &stPath)
     while (std::getline(in, line))
     {
         auto vals = splitStr(line, delim);
-        symbols[vals[0]] = {vals[0], vals[1], 0};
+        symbols[vals[0]] = {vals[0], vals[1], 0, 0};
     }
 
     in.close();
@@ -82,9 +85,9 @@ void Translator::loadST(const std::string &stPath)
 
 void Translator::writeST()
 {
-    std::ofstream symTable("data/translator-symboltable.txt");
+    std::ofstream symTable("translator-symboltable.txt");
 
-    symTable << "ID | DT | S" << std::endl;
+    symTable << "ID | DT | S | IV" << std::endl;
 
     std::vector<STData> vec;
     for (std::map<std::string, STData>::iterator itr = symbols.begin(); itr != symbols.end(); itr++)
@@ -94,12 +97,16 @@ void Translator::writeST()
 
     for (int i = 0; i < vec.size(); i++)
     {
-        symTable << vec[i].lex
-                 << " | "
-                 << vec[i].dt
-                 << " | "
-                 << vec[i].addr
-                 << '\n';
+        if (!vec[i].lex.empty()) {
+            symTable << vec[i].lex
+                << " | "
+                << vec[i].dt
+                << " | "
+                << vec[i].addr
+                << " | "
+                << vec[i].initVal
+                << '\n';
+        }
     }
 
     symTable.close();
@@ -108,11 +115,28 @@ void Translator::writeST()
 void Translator::writeTAC()
 {
 
-    std::ofstream out("data/tac.txt");
+    std::ofstream out("tac.txt");
     ASSERT(!out.is_open(), ERRORS::TAC_FILE_OPEN_ERROR);
 
     for (int line = 0; line < tacLines.size(); line++)
         out << tacLines[line];
+}
+
+void Translator::writeMC()
+{
+
+    std::ofstream out("machine-code.txt");
+    ASSERT(!out.is_open(), ERRORS::MC_FILE_OPEN_ERROR);
+
+    for (int line = 0; line < tacLines.size(); line++)
+        out << std::get<0>(quadTuples[line])
+            << " "
+            << std::get<1>(quadTuples[line])
+            << " "
+            << std::get<2>(quadTuples[line])
+            << " "
+            << std::get<3>(quadTuples[line])
+            << "\n";
 }
 
 void Translator::emit(int num, ...)
@@ -132,6 +156,24 @@ void Translator::emit(int num, ...)
     va_end(valist);
 
     n++;
+}
+
+void Translator::quad(int a, int b, int c, int d)
+{
+    quadTuples.push_back({a, b, c, d});
+}
+
+std::string Translator::handleNumericConstant(const std::string &str)
+{
+    if (isNumber(str))
+    {
+        int val = atoi(str.c_str());
+        std::string temp = "t" + std::to_string(tempValIdx++);
+        symbols[temp] = {temp, "Integer", 0, val};
+        addToST(4, temp);
+        return temp;
+    }
+    return str;
 }
 
 void Translator::backpatch(int lineNo, int value)
@@ -176,7 +218,7 @@ void Translator::match(const std::string &token)
     if (look->lexeme == token)
         look++;
     else
-        PAR_LOG(ERRORS::BAD_TOK, token, look->lexeme);
+        TR_LOG(ERRORS::BAD_TOK, token, look->lexeme);
 }
 
 std::pair<std::string, int> Translator::datatype()
@@ -189,7 +231,7 @@ std::pair<std::string, int> Translator::datatype()
         return ret;
     }
     else
-        PAR_LOG(ERRORS::BAD_TOK, "char or Integer", look->lexeme);
+        TR_LOG(ERRORS::BAD_TOK, "char or Integer", look->lexeme);
 }
 
 std::string Translator::identifier()
@@ -202,7 +244,7 @@ std::string Translator::identifier()
         return lex;
     }
     else
-        PAR_LOG(ERRORS::BAD_TOK, "of type Identifier", look->lexeme);
+        TR_LOG(ERRORS::BAD_TOK, "of type Identifier", look->lexeme);
 }
 
 void Translator::variable()
@@ -256,7 +298,7 @@ std::string Translator::literalConstant()
         return lex;
     }
     else
-        PAR_LOG(ERRORS::BAD_TOK, "of type Literal Constant", look->lexeme);
+        TR_LOG(ERRORS::BAD_TOK, "of type Literal Constant", look->lexeme);
 }
 
 std::string Translator::numConstant()
@@ -269,7 +311,7 @@ std::string Translator::numConstant()
         return lex;
     }
     else
-        PAR_LOG(ERRORS::BAD_TOK, "of type Number Constant/Number", look->lexeme);
+        TR_LOG(ERRORS::BAD_TOK, "of type Number Constant/Number", look->lexeme);
 }
 
 std::string Translator::F()
@@ -298,24 +340,28 @@ std::string Translator::termPrime(std::string &prevLex)
     if (look->lexeme == "*")
     {
         match("*");
-        std::string termLex = "* " + F() + " ";
+        auto fVal = F();
+        std::string termLex = "* " + fVal + " ";
 
         std::string temp = "t" + std::to_string(tempValIdx++);
-        symbols[temp] = {temp, "Integer", 0};
+        symbols[temp] = {temp, "Integer", 0, 0};
         addToST(4, temp);
         emit(4, temp.c_str(), "=", prevLex.c_str(), termLex.c_str());
+        quad(opcodes["*"], symbols[handleNumericConstant(prevLex)].addr, symbols[handleNumericConstant(fVal)].addr, symbols[temp].addr);
 
         return termPrime(temp);
     }
     else if (look->lexeme == "/")
     {
         match("/");
-        std::string termLex = "/ " + F() + " ";
+        auto fVal = F();
+        std::string termLex = "/ " + fVal + " ";
 
         std::string temp = "t" + std::to_string(tempValIdx++);
-        symbols[temp] = {temp, "Integer", 0};
+        symbols[temp] = {temp, "Integer", 0, 0};
         addToST(4, temp);
         emit(4, temp.c_str(), "=", prevLex.c_str(), termLex.c_str());
+        quad(opcodes["/"], symbols[handleNumericConstant(prevLex)].addr, symbols[handleNumericConstant(fVal)].addr, symbols[temp].addr);
 
         return termPrime(temp);
     }
@@ -335,24 +381,28 @@ std::string Translator::expressionPrime(std::string &prevLex)
     if (look->lexeme == "+")
     {
         match("+");
-        std::string termLex = "+ " + term() + " ";
+        auto tVal = term();
+        std::string termLex = "+ " + tVal + " ";
 
         std::string temp = "t" + std::to_string(tempValIdx++);
-        symbols[temp] = {temp, "Integer", 0};
+        symbols[temp] = {temp, "Integer", 0, 0};
         addToST(4, temp);
         emit(4, temp.c_str(), "=", prevLex.c_str(), termLex.c_str());
+        quad(opcodes["+"], symbols[handleNumericConstant(prevLex)].addr, symbols[handleNumericConstant(tVal)].addr, symbols[temp].addr);
 
         return expressionPrime(temp);
     }
     else if (look->lexeme == "-")
     {
         match("-");
-        std::string termLex = "- " + term() + " ";
+        auto tVal = term();
+        std::string termLex = "- " + tVal + " ";
 
         std::string temp = "t" + std::to_string(tempValIdx++);
-        symbols[temp] = {temp, "Integer", 0};
+        symbols[temp] = {temp, "Integer", 0, 0};
         addToST(4, temp);
         emit(4, temp.c_str(), "=", prevLex.c_str(), termLex.c_str());
+        quad(opcodes["-"], symbols[handleNumericConstant(prevLex)].addr, symbols[handleNumericConstant(tVal)].addr, symbols[temp].addr);
 
         return expressionPrime(temp);
     }
@@ -432,6 +482,7 @@ void Translator::variableAssignment()
     match(";");
 
     emit(3, idLex.c_str(), "=", valLex.c_str());
+    quad(opcodes["="], symbols[handleNumericConstant(valLex)].addr, symbols[idLex].addr, 0);
 }
 
 std::string Translator::relationalOperator()
@@ -444,7 +495,7 @@ std::string Translator::relationalOperator()
         return lex;
     }
     else
-        PAR_LOG(ERRORS::BAD_TOK, "of type RO", look->lexeme);
+        TR_LOG(ERRORS::BAD_TOK, "of type RO", look->lexeme);
 }
 
 std::string Translator::with()
@@ -455,7 +506,7 @@ std::string Translator::with()
     else if (look->type == "NUMC")
         return numConstant();
     else
-        PAR_LOG(ERRORS::BAD_TOK, "of type Identifier or Number", look->lexeme);
+        TR_LOG(ERRORS::BAD_TOK, "of type Identifier or Number", look->lexeme);
 }
 
 std::pair<int, int> Translator::comparison()
@@ -470,8 +521,11 @@ std::pair<int, int> Translator::comparison()
     std::pair<int, int> ret;
     ret.first = n;
     emit(5, "if", idLex.c_str(), reLex.c_str(), wLex.c_str(), "goto");
+    std::string val = handleNumericConstant(wLex);
+    quad(opcodes[reLex == "=" ? "==" : reLex], symbols[idLex].addr, symbols[val].addr, 0);
     ret.second = n;
     emit(1, "goto");
+    quad(opcodes["goto"], 0, 0, 0);
 
     return ret;
 }
@@ -483,13 +537,16 @@ void Translator::whileLoop()
     int start = n;
     std::pair<int, int> cmpRet = comparison();
     backpatch(cmpRet.first, n);
+    std::get<3>(quadTuples[cmpRet.first - 1]) = n;
     match(":");
     match("{");
     codeBlock();
     match("}");
 
     emit(2, "goto", std::to_string(start).c_str());
+    quad(opcodes["goto"], start, 0, 0);
     backpatch(cmpRet.second, n);
+    std::get<1>(quadTuples[cmpRet.second - 1]) = n;
 }
 
 std::string Translator::stringLiteral()
@@ -503,7 +560,7 @@ std::string Translator::stringLiteral()
         return lex;
     }
     else
-        PAR_LOG(ERRORS::BAD_TOK, "String", look->lexeme);
+        TR_LOG(ERRORS::BAD_TOK, "String", look->lexeme);
 }
 
 std::string Translator::output()
@@ -515,7 +572,7 @@ std::string Translator::output()
     else if (look->type == "ID")
         return identifier();
     else
-        PAR_LOG(ERRORS::BAD_TOK, "of type String or Identifier", look->lexeme);
+        TR_LOG(ERRORS::BAD_TOK, "of type String or Identifier", look->lexeme);
 }
 
 void Translator::printStatement()
@@ -530,6 +587,7 @@ void Translator::printStatement()
         match(";");
 
         emit(2, "out", lex.c_str());
+        quad(opcodes["out"], symbols[lex].addr, 0, 0);
     }
 
     else if (look->lexeme == "println")
@@ -540,10 +598,11 @@ void Translator::printStatement()
         match(")");
         match(";");
 
-        emit(3, "out", lex.c_str(), "\\n");
+        emit(2, "outln", lex.c_str());
+        quad(opcodes["outln"], symbols[lex].addr, 0, 0);
     }
     else
-        PAR_LOG(ERRORS::BAD_TOK, "of type print or pritln", look->lexeme);
+        TR_LOG(ERRORS::BAD_TOK, "of type print or pritln", look->lexeme);
 }
 
 void Translator::inputStatement()
@@ -555,6 +614,7 @@ void Translator::inputStatement()
     match(";");
 
     emit(2, "in", idLex.c_str());
+    quad(opcodes["in"], symbols[idLex].addr, 0, 0);
 }
 
 void Translator::returnStatement()
@@ -565,6 +625,7 @@ void Translator::returnStatement()
     match(";");
 
     emit(2, "ret", lex.c_str());
+    quad(opcodes["ret"], symbols[lex].addr, 0, 0);
 }
 
 int Translator::ifStatement()
@@ -573,6 +634,7 @@ int Translator::ifStatement()
     match("if");
     std::pair<int, int> cmpRet = comparison();
     backpatch(cmpRet.first, n);
+    std::get<3>(quadTuples[cmpRet.first - 1]) = n;
     match(":");
     match("{");
     codeBlock();
@@ -587,6 +649,7 @@ int Translator::elifStatement()
     match("elif");
     std::pair<int, int> cmpRet = comparison();
     backpatch(cmpRet.first, n);
+    std::get<3>(quadTuples[cmpRet.first - 1]) = n;
     match(":");
     match("{");
     codeBlock();
@@ -612,10 +675,13 @@ void Translator::conditionalStatementPrime()
         int cmpF = ifStatement();
         int next = n;
         emit(1, "goto");
+        quad(opcodes["goto"], 0, 0, 0);
         backpatch(cmpF, n);
+        std::get<1>(quadTuples[cmpF - 1]) = n;
         conditionalStatementPrime();
 
         backpatch(next, n);
+        std::get<1>(quadTuples[next - 1]) = n;
     }
 
     else if (look->lexeme == "elif")
@@ -623,10 +689,13 @@ void Translator::conditionalStatementPrime()
         int cmpF = elifStatement();
         int next = n;
         emit(1, "goto");
+        quad(opcodes["goto"], 0, 0, 0);
         backpatch(cmpF, n);
+        std::get<1>(quadTuples[cmpF - 1]) = n;
         conditionalStatementPrime();
 
         backpatch(next, n);
+        std::get<1>(quadTuples[next - 1]) = n;
     }
 
     else if (look->lexeme == "else")
@@ -646,10 +715,14 @@ void Translator::conditionalStatement()
     int cmpF = ifStatement();
     int next = n;
     emit(1, "goto");
+    quad(opcodes["goto"], 0, 0, 0);
     backpatch(cmpF, n);
+    std::get<1>(quadTuples[cmpF - 1]) = n;
+
     conditionalStatementPrime();
 
     backpatch(next, n);
+    std::get<1>(quadTuples[next - 1]) = n;
 }
 
 void Translator::statement()
@@ -779,4 +852,11 @@ void Translator::run(const std::string &wListPath, const std::string &stPath)
     writeST();
 
     writeTAC();
+
+    writeMC();
+}
+
+Translator::~Translator()
+{
+    delete m_Instance;
 }

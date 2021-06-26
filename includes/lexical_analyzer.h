@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <map>
+#include <string>
 
 typedef std::pair<std::string, std::string> PAIR;
 class LexicalAnalyzer

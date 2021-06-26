@@ -1,12 +1,13 @@
-ID | DT | S
-num | Integer | 0
-length | Integer | 4
-i | Integer | 8
-j | Integer | 12
-first | Integer | 16
-temp | Integer | 20
-a | char | 24
-t1 | Integer | 25
-t2 | Integer | 29
-t3 | Integer | 33
-t4 | Integer | 37
+ID | DT | S | IV
+num | Integer | 0 | 0
+length | Integer | 4 | 0
+i | Integer | 8 | 0
+j | Integer | 12 | 0
+k | Integer | 16 | 0
+t1 | Integer | 20 | 0
+t2 | Integer | 24 | 0
+t3 | Integer | 28 | 2
+t4 | Integer | 32 | 0
+t5 | Integer | 36 | 1
+t6 | Integer | 40 | 0
+t7 | Integer | 44 | 1

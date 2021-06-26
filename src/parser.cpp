@@ -1,6 +1,7 @@
 #include "parser.h"
 
 #include <iostream>
+#include <algorithm>
 
 #include "error_handler.h"
 
@@ -39,12 +40,14 @@ std::vector<Parser::Token> Parser::loadTokens(const std::string &wListPath)
         toks.push_back(Parser::Token(id, tok));
     }
 
+    in.close();
+
     return toks;
 }
 
 void Parser::writeST()
 {
-    std::ofstream symTable("data/parser-symboltable.txt");
+    std::ofstream symTable("parser-symboltable.txt");
 
     symTable << "ID | DT" << std::endl;
     for (SYMBOL_MAP::iterator itr = symbols.begin(); itr != symbols.end(); itr++)
@@ -777,9 +780,14 @@ std::vector<Parser::Token> Parser::run(const std::string &wListPath)
     look = toks.begin();
     end = toks.end();
 
-    parseTreeFile = std::ofstream("data/parsetree.txt");
+    parseTreeFile = std::ofstream("parsetree.txt");
     source();
     writeST();
 
     return toks;
+}
+
+Parser::~Parser()
+{
+    delete m_Instance;
 }

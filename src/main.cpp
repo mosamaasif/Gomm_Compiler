@@ -3,16 +3,23 @@
 #include "lexical_analyzer.h"
 #include "parser.h"
 #include "translator.h"
+#include "virtual_machine.h"
 
-int main() {
+int main()
+{
 
-    try {
+    try
+    {
         auto la = LexicalAnalyzer::getInstance();
-        auto parser = Parser::getInstance("data/words.txt");
-        auto translator = Translator::getInstance("data/words.txt", "data/parser-symboltable.txt");
+        auto parser = Parser::getInstance("words.txt");
+        auto translator = Translator::getInstance("words.txt", "parser-symboltable.txt");
+        auto vm = VirtualMachine::getInstance();
+        vm->run();
     }
-    catch (std::runtime_error& error) {
-        std::cerr << std::endl << error.what() << std::endl;
+    catch (std::runtime_error &error)
+    {
+        std::cerr << std::endl
+                  << error.what() << std::endl;
     }
 
     return 0;

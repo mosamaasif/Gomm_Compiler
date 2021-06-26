@@ -1,35 +1,33 @@
 {
-	// See https://go.microsoft.com/fwlink/?LinkId=733558
-	// for the documentation about the tasks.json format
-	"version": "2.0.0",
-	"tasks": [
-		{
-			"type": "shell",
-			"label": "debug build current file",
-			"command": "/usr/bin/clang++",
-			"args": [
-				"-std=c++14",
-				"-stdlib=libc++",
-				"-I",
-				"${workspaceFolder}/includes/",
-				"-g",
-				"${workspaceFolder}/src/main.cpp",
-				"${workspaceFolder}/src/lexical_analyzer.cpp",
-				"${workspaceFolder}/src/parser.cpp",
-				"${workspaceFolder}/src/translator.cpp",
-				"-o",
-				"out/debug/main"
-			],
-			"options": {
-				"cwd": "${workspaceFolder}"
-			},
-			"problemMatcher": [
-				"$gcc"
-			],
-			"group": {
-				"kind": "build",
-				"isDefault": true
-			}
-		}
-	]
+  // See https://go.microsoft.com/fwlink/?LinkId=733558
+  // for the documentation about the tasks.json format
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "shell",
+      "label": "debug build current file",
+      "command": "/usr/bin/clang++",
+      "args": [
+        "-std=c++14",
+        "-stdlib=libc++",
+        "-I",
+        "${workspaceFolder}/includes/",
+        "-g",
+        "${workspaceFolder}/src/main.cpp",
+        "${workspaceFolder}/src/lexical_analyzer.cpp",
+        "${workspaceFolder}/src/parser.cpp",
+        "${workspaceFolder}/src/translator.cpp",
+        "-o",
+        "out/debug/main"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": ["$gcc"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    }
+  ]
 }
