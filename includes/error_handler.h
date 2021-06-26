@@ -17,7 +17,9 @@ enum ERRORS
     BAD_TOK,
     SYMBOL_TABLE_FILE_OPEN_ERROR,
     TAC_FILE_OPEN_ERROR,
-    MC_FILE_OPEN_ERROR
+    MC_FILE_OPEN_ERROR,
+    DIV_BY_ZERO,
+    IN_NOT_NUM,
 };
 
 static std::string FILENAME;
@@ -35,7 +37,9 @@ static const std::string ERR_MSGS[] = {
     "Bad Token",
     "Failed to Open Symbol Table File",
     "Failed to Open Three Address Code File",
-    "Failed to Open Machine Code File"};
+    "Failed to Open Machine Code File",
+    "Denominator cannot be Zero in Division!",
+    "Input has to be Integer!"};
 
 static std::string buildErrorStr(const ERRORS &err)
 {
@@ -58,6 +62,13 @@ static std::string buildParErrorStr(const ERRORS &err, const std::string &expTok
     return error;
 }
 
+static std::string buildTransErrorStr(const ERRORS& err, const std::string& expTok, const std::string& foundTok)
+{
+    std::string error = std::string() + "[TRANSLATOR ERROR]" + "\n\tTYPE: " + ERR_MSGS[err] + "\n\tMESSAGE: " + "Expected token \'" + expTok + "\', but found token \'" + foundTok + "\'" + "\n\tFILE: " + FILENAME + "\n\n";
+
+    return error;
+}
+
 #define ASSERT(cmp, err_type) \
     if (cmp)                  \
     throw std::runtime_error(buildErrorStr(err_type))
@@ -66,4 +77,7 @@ static std::string buildParErrorStr(const ERRORS &err, const std::string &expTok
     throw std::runtime_error(buildLAErrorStr(err_type))
 
 #define PAR_LOG(err_type, expTok, foundTok) \
+    throw std::runtime_error(buildParErrorStr(err_type, expTok, foundTok))
+
+#define TR_LOG(err_type, expTok, foundTok) \
     throw std::runtime_error(buildParErrorStr(err_type, expTok, foundTok))

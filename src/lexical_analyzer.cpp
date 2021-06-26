@@ -53,7 +53,7 @@ std::string LexicalAnalyzer::loadFile(const std::string &scPath)
 void LexicalAnalyzer::saveToFile(const std::vector<PAIR> &tokens)
 {
 
-    std::ofstream out("data/words.txt");
+    std::ofstream out("words.txt");
     ASSERT(!out.is_open(), ERRORS::TOK_FILE_OPEN_ERROR);
 
     for (const PAIR token : tokens)
